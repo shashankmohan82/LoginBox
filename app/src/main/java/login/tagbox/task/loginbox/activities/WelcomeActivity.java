@@ -29,7 +29,6 @@ public class WelcomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         textView = (TextView)findViewById(R.id.welcome_textView);
         textView.setText("User logged in");
 
