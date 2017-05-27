@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#CA4A39</color>
+    <color name="colorPrimaryDark">#c73b28</color>
+    <color name="colorAccent">#c73b28</color>
+    <color name="colorAccentEdit">#fdf1e6</color>
+    <color name="theme_final_signin_pressed">#E65542</color>
+    <color name="theme_final_signin">#CA4A39</color>
+</resources>
