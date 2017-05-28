@@ -63,7 +63,6 @@ public class PasswordEncryption {
                 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             // Below Android M, use the KeyPairGeneratorSpec.Builder.
 
-
             spec = new KeyPairGeneratorSpec.Builder(context)
                     .setAlias(alias)
                     .setSubject(new X500Principal("CN=" + alias))

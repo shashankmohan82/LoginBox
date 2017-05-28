@@ -34,7 +34,7 @@ public class SessionHandler {
 
     public static String readUserNameFromPreference(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(SESSION_PREFS_NAME, MODE_PRIVATE);
-        String userName = prefs.getString(context.getString(R.string.preference_username), null);
+        String userName = prefs.getString(context.getString(R.string.preference_username), "");
         return userName;
     }
 

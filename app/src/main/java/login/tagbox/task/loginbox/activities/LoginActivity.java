@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity  {
         mPasswordView = (EditText) findViewById(R.id.password);
 
 
-        if(SessionHandler.readUserNameFromPreference(this) != null){
+        if( !SessionHandler.readUserNameFromPreference(this).equals("")){
 
             mUserNameView.setText(SessionHandler.readUserNameFromPreference(this));
             String password = SessionHandler.decryptPasswordFromKeyStore(this);
@@ -228,8 +228,6 @@ public class LoginActivity extends AppCompatActivity  {
         protected Boolean doInBackground(Void... params) {
 
             OkHttpClient client = new OkHttpClient();
-
-
             HashMap<String,String> jsonMap = new HashMap<>();
 
             LocationInfo locationInfo = new LocationInfo(getBaseContext());
@@ -237,8 +235,13 @@ public class LoginActivity extends AppCompatActivity  {
 
             jsonMap.put(API_USERNAME_KEY,mUserName);
             jsonMap.put(API_PASSWORD_KEY,mPassword);
-            jsonMap.put(API_LOCATION_KEY,locationInfo.getLocation().getLatitude()+";" +
-                    " "+locationInfo.getLocation().getLongitude());
+            if(locationInfo.getLocation() != null) {
+                jsonMap.put(API_LOCATION_KEY, locationInfo.getLocation().getLatitude() + ";" +
+                        " " + locationInfo.getLocation().getLongitude());
+            }
+            else{
+                jsonMap.put(API_LOCATION_KEY, "");
+            }
             jsonMap.put(API_TIMESTAMP_KEY,calendar.getTime()+"");
 
             JSONObject obj = new JSONObject(jsonMap);
@@ -298,7 +301,7 @@ public class LoginActivity extends AppCompatActivity  {
                 }
                 else{
                     SessionHandler.writeSessionFlagToPreference(this,0);
-                    SessionHandler.writeUserNameToPreference(this,null);
+                    SessionHandler.writeUserNameToPreference(this,"");
                 }
                 Intent intent = new Intent(this,WelcomeActivity.class);
                 startActivity(intent);
@@ -350,7 +353,10 @@ public class LoginActivity extends AppCompatActivity  {
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                 //normal flow happens with location getting sent to  rest api
+            }
+            else{
+                //empty location data is being sent to rest api
             }
         }
     }

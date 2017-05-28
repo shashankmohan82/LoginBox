@@ -10,7 +10,7 @@
     <string name="error_invalid_password">Password cannot be empty</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Location permission is needed to authenticate with server."
+    <string name="permission_rationale">"Location permission helps us get you local content from LoginBox team"
     </string>
     <string name="title_activity_welcome">Authenticated</string>
 
