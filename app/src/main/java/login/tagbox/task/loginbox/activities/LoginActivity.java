@@ -32,13 +32,11 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
-
 import login.tagbox.task.loginbox.R;
 import login.tagbox.task.loginbox.utils.LocationInfo;
 import login.tagbox.task.loginbox.utils.NotificationHandler;
 import login.tagbox.task.loginbox.utils.PasswordEncryption;
 import login.tagbox.task.loginbox.utils.SessionHandler;
-
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class LoginActivity extends AppCompatActivity  {
@@ -57,9 +55,7 @@ public class LoginActivity extends AppCompatActivity  {
     private static final String API_CONTENT_TYPE_HEADER_VALUE = "text/plain";
     private static final String API_CACHE_TYPE_HEADER_KEY = "cache-control";
     private static final String API_CACHE_TYPE_HEADER_VALUE = "no-cache";
-
     private UserLoginTask mAuthTask = null;
-
     private EditText mUserNameView;
     private EditText mPasswordView;
     private View mProgressView;
@@ -92,7 +88,6 @@ public class LoginActivity extends AppCompatActivity  {
             if(password != null){
                 mPasswordView.setText(password);
             }
-
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -212,8 +207,6 @@ public class LoginActivity extends AppCompatActivity  {
         }
     }
 
-
-
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mUserName;
@@ -227,7 +220,7 @@ public class LoginActivity extends AppCompatActivity  {
         @Override
         protected Boolean doInBackground(Void... params) {
 
-            OkHttpClient client = new OkHttpClient();
+            final OkHttpClient client = new OkHttpClient();
             HashMap<String,String> jsonMap = new HashMap<>();
 
             LocationInfo locationInfo = new LocationInfo(getBaseContext());
