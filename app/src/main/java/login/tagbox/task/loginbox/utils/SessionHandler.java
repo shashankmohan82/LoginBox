@@ -2,6 +2,8 @@ package login.tagbox.task.loginbox.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -32,8 +34,8 @@ public class SessionHandler {
 
     public static String readUserNameFromPreference(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(SESSION_PREFS_NAME, MODE_PRIVATE);
-        String sessonFlag = prefs.getString(context.getString(R.string.preference_username), null);
-        return sessonFlag;
+        String userName = prefs.getString(context.getString(R.string.preference_username), null);
+        return userName;
     }
 
     public static void writeUserNameToPreference(Context context, String userName) {
@@ -74,7 +76,8 @@ public class SessionHandler {
         String passwordHash = prefs.getString(context.getString(R.string.preference_password_hashed), null);
 
         //decrypt using keystore
+        Log.d("time",passwordHash);
         PasswordEncryption passwordEncryption = new PasswordEncryption();
-        return passwordEncryption.decryptString("password_alias",passwordHash);
+        return passwordEncryption.decryptString(context.getString(R.string.keystore_alias),passwordHash);
     }
 }

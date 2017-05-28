@@ -5,6 +5,8 @@ import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
+import android.util.Log;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,18 +15,22 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 public class PasswordEncryption {
@@ -35,7 +41,7 @@ public class PasswordEncryption {
     public static void createKeys(Context context, String alias) throws NoSuchProviderException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, KeyStoreException {
 
-        keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER_ANDROID_KEYSTORE);
         try {
             keyStore.load(null);
         } catch (IOException e) {
@@ -85,16 +91,32 @@ public class PasswordEncryption {
     public String encryptString(String alias,String password) {
         byte [] valuebytes = null;
         try {
+            byte[] key = null;
 
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias, null);
-            RSAPublicKey publicKey = (RSAPublicKey) privateKeyEntry.getCertificate().getPublicKey();
+            try {
+                keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER_ANDROID_KEYSTORE);
+                keyStore.load(null);
+                KeyStore.Entry entry = keyStore.getEntry(alias, null);
+                key = entry.toString().getBytes("UTF-8");
+            } catch (CertificateException
+                    | KeyStoreException
+                    | UnrecoverableEntryException
+                    | NoSuchAlgorithmException
+                    | IOException e
+                    ) {
+            }
 
-            Cipher input = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
-            input.init(Cipher.ENCRYPT_MODE, publicKey);
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, 16);
+            SecretKeySpec sks = new SecretKeySpec(key, "AES");
+
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, sks);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             CipherOutputStream cipherOutputStream = new CipherOutputStream(
-                    outputStream, input);
+                    outputStream, cipher);
             cipherOutputStream.write(password.getBytes("UTF-8"));
             cipherOutputStream.close();
 
@@ -109,15 +131,34 @@ public class PasswordEncryption {
     public String decryptString(String alias,String passwordHash) {
         String finalString = null;
         try {
-            KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(alias, null);
-            RSAPrivateKey privateKey = (RSAPrivateKey) privateKeyEntry.getPrivateKey();
 
-            Cipher output = Cipher.getInstance("RSA/ECB/PKCS1Padding", "AndroidOpenSSL");
-            output.init(Cipher.DECRYPT_MODE, privateKey);
+            byte[] key = null;
+
+            try {
+                keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER_ANDROID_KEYSTORE);
+                keyStore.load(null);
+                KeyStore.Entry entry = keyStore.getEntry(alias, null);
+                key = entry.toString().getBytes("UTF-8");
+            } catch (CertificateException
+                    | KeyStoreException
+                    | UnrecoverableEntryException
+                    | NoSuchAlgorithmException
+                    | IOException e
+                    ) {
+            }
+
+            // getting cipher input stream
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, 16);
+            SecretKeySpec sks = new SecretKeySpec(key, "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, sks);
+
 
             String cipherText = passwordHash;
             CipherInputStream cipherInputStream = new CipherInputStream(
-                    new ByteArrayInputStream(Base64.decode(cipherText, Base64.DEFAULT)), output);
+                    new ByteArrayInputStream(Base64.decode(cipherText, Base64.DEFAULT)), cipher);
             ArrayList<Byte> values = new ArrayList<>();
             int nextByte;
 
@@ -129,11 +170,9 @@ public class PasswordEncryption {
             for(int i = 0; i < bytes.length; i++) {
                 bytes[i] = values.get(i).byteValue();
             }
-
             String finalText = new String(bytes, 0, bytes.length, "UTF-8");
             finalString = finalText;
         } catch (Exception e) {
-
         }
         return finalString;
     }

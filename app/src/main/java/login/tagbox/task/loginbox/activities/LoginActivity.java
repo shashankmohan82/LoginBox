@@ -229,6 +229,7 @@ public class LoginActivity extends AppCompatActivity  {
 
             OkHttpClient client = new OkHttpClient();
 
+
             HashMap<String,String> jsonMap = new HashMap<>();
 
             LocationInfo locationInfo = new LocationInfo(getBaseContext());

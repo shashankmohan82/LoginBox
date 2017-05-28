@@ -28,6 +28,5 @@
     <string name="preference_password_hashed">password</string>
     <string name="preference_username">userName</string>
     <string name="preference_session_flag">sessionFlag</string>
-    <string name="key_alias">touch</string>
     <string name="keystore_alias">password_alias</string>
 </resources>
